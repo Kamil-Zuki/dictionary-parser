@@ -1,0 +1,4 @@
+﻿@URLBase=https://localhost:7025/v1/parser/term-data?
+
+
+GET {{URLBase}}term=pick%20up

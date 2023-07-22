@@ -1,0 +1,11 @@
+bin/
+obj/
+/packages/
+riderModule.iml
+/_ReSharper.Caches/
+.idea
+*.vs/
+<<<<<<< HEAD
+
+=======
+>>>>>>> 2274963584e32c24d76aecdae78c7e35c15e831f
