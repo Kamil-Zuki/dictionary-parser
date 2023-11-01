@@ -6,9 +6,9 @@ using System.Net;
 
 namespace dictionary_parser.Controllers
 {
-    //[Authorize]
+    [Authorize]
     [ApiController]
-    [Route("api/cambridge-dictionary")]
+    [Route("api/v1/cambridge-dictionary")]
     public class CambridgeDictionaryController : ControllerBase
     {
         private readonly IHtmlDataExtraction _htmlDataExtraction;
@@ -18,7 +18,7 @@ namespace dictionary_parser.Controllers
         }
 
 
-        [HttpGet("v1/term-data")]
+        [HttpGet("term")]
         public async Task<ActionResult<WordStructure>> ExtractWordData([FromQuery(Name = "term")] string term, bool? isWord = true, bool? isPhrasalVerb = true, bool? isIdiom = true)
         {
             try

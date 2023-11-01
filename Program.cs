@@ -1,7 +1,6 @@
 using dictionary_parser.BLL.Interfaces;
 using dictionary_parser.BLL.Services;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
-using Microsoft.Extensions.Options;
 using Microsoft.IdentityModel.Tokens;
 using Microsoft.OpenApi.Models;
 using System.Text;
@@ -80,24 +79,25 @@ var app = builder.Build();
 
 // Configure the HTTP request pipeline.
 
-app.UseSwagger(c => {
+app.UseSwagger(c =>
+{
     c.RouteTemplate = "dictionary-parser/swagger/{documentname}/swagger.json";
 });
 
 app.UseSwaggerUI(c =>
 {
-    c.SwaggerEndpoint("/dictionary-parser/swagger/v1/swagger.json", "Dictionary Parser API"); 
+    c.SwaggerEndpoint("/dictionary-parser/swagger/v1/swagger.json", "Dictionary Parser API");
     c.RoutePrefix = "dictionary-parser/swagger";
 });
 
-app.MapControllers();
+
 
 app.UseCors(MyAllowSpecificOrigins);
 
 app.UseRouting();
-
-app.UseAuthentication();
+app.UseHttpsRedirection();
+//app.UseAuthentication();
 app.UseAuthorization();
-
+app.MapControllers();
 
 app.Run();
