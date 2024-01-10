@@ -12,9 +12,6 @@ Now it includes an endpoint specifically created for parsing word pages from the
 - Chinese dictionary parser(...) - :construction: In process
 - ...
 
-## License
-This project is licensed under the MIT License.
-
 ## Prerequisites
 
 To run this project on your local machine, you need to have the following dependencies installed:
