@@ -1,7 +1,7 @@
 # Dictionary Parser
 ## [Cambridge Dictionary](https://dictionary.cambridge.org/) parser
 
-The Dictionary Parser is an **ASP.NET Core 7.0** project designed to parse foreign dictionaries.
+The Dictionary Parser is an **ASP.NET Core 8.0** project designed to parse foreign dictionaries.
 
 Now it includes an endpoint specifically created for parsing word pages from the **Cambridge Dictionary**. 
 
