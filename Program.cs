@@ -91,13 +91,13 @@ app.UseSwaggerUI(c =>
 });
 
 
+app.MapControllers();
 
 app.UseCors(MyAllowSpecificOrigins);
 
 app.UseRouting();
-app.UseHttpsRedirection();
-//app.UseAuthentication();
+//app.UseHttpsRedirection();
+app.UseAuthentication();
 app.UseAuthorization();
-app.MapControllers();
 
 app.Run();
