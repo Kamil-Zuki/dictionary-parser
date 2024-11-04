@@ -18,14 +18,12 @@ namespace dictionary_parser.Controllers
         }
 
 
-        [HttpGet("term")]
-        public async Task<ActionResult<WordStructure>> ExtractWordData([FromQuery(Name = "term")] string term, bool? isWord = true, bool? isPhrasalVerb = true, bool? isIdiom = true)
+        [HttpGet]
+        public async Task<ActionResult<WordStructure>> ExtractWordData(string term, bool? isWord = true, bool? isPhrasalVerb = true, bool? isIdiom = true)
         {
             try
             {
-                string decodedTerm = WebUtility.UrlDecode(term);
-
-                return Ok(await _htmlDataExtraction.GetTerms(decodedTerm, isWord, isPhrasalVerb, isIdiom));
+                return Ok(await _htmlDataExtraction.GetTerms(term, isWord, isPhrasalVerb, isIdiom));
             }
             catch (Exception ex)
             {

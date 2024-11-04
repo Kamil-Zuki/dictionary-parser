@@ -1,85 +1,74 @@
 using dictionary_parser.BLL.Interfaces;
 using dictionary_parser.BLL.Services;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
+using Microsoft.AspNetCore.Identity;
+using Microsoft.Extensions.Configuration;
 using Microsoft.IdentityModel.Tokens;
 using Microsoft.OpenApi.Models;
+using Swashbuckle.AspNetCore.Filters;
 using System.Text;
 
-var MyAllowSpecificOrigins = "_myAllowSpecificOrigins";
 var builder = WebApplication.CreateBuilder(args);
 
 // Add services to the container.
 #if RELEASE
 builder.WebHost.UseUrls("http://*:80");
 #endif
+
 builder.Services.AddControllers();
-// Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
 
-builder.Services.AddCors(options =>
+builder.Services.AddCors(c => c.AddPolicy("cors", opt =>
 {
-    options.AddPolicy(name: MyAllowSpecificOrigins,
-                      policy =>
-                      {
-                          policy
-                          .AllowAnyOrigin()
-                          .AllowAnyMethod()
-                          .AllowAnyHeader();
-                      });
-});
+    opt.AllowAnyHeader();
+    opt.AllowAnyMethod();
+    opt.AllowAnyOrigin();
+}));
 
-builder.Services.AddScoped<IHtmlDataExtraction, HtmlDataExtraction>();
-
-builder.Services.AddEndpointsApiExplorer();
-builder.Services.AddSwaggerGen(c =>
+builder.Services.AddAuthentication(options =>
 {
-    c.SwaggerDoc("v1", new OpenApiInfo { Title = "Dictionary Parser API", Version = "v1" });
-    c.AddSecurityDefinition("Bearer", new OpenApiSecurityScheme
+    options.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;
+    options.DefaultChallengeScheme = JwtBearerDefaults.AuthenticationScheme;
+})
+.AddJwtBearer(options =>
+{
+    options.TokenValidationParameters = new TokenValidationParameters
     {
-        In = ParameterLocation.Header,
-        Description = "Please enter a valid token",
-        Name = "Authorization",
-        Type = SecuritySchemeType.Http,
-        BearerFormat = "JWT",
-        Scheme = "Bearer"
-    });
-    c.AddSecurityRequirement(new OpenApiSecurityRequirement
-            {
-             {
-            new OpenApiSecurityScheme
-            {
-                Reference = new OpenApiReference
-                {
-                    Type = ReferenceType.SecurityScheme,
-                    Id = "Bearer"
-                }
-            },
-            new string[]{}
-        }
-    });
-
+        ValidateIssuer = true,
+        ValidateAudience = true,
+        ValidateLifetime = true,
+        ValidateIssuerSigningKey = true,
+        ValidIssuer = builder.Configuration.GetValue<string>("Jwt:Issuer"),
+        ValidAudience = builder.Configuration.GetValue<string>("Jwt:Audience"),
+        IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(builder.Configuration.GetValue<string>("Jwt:Secret")!))
+    };
 });
-
-builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
-            .AddJwtBearer(options =>
-            {
-                // Configure the JwtBearer authentication options
-                options.TokenValidationParameters = new TokenValidationParameters
-                {
-                    ValidateIssuer = true,
-                    ValidateAudience = true,
-                    ValidateLifetime = true,
-                    ValidIssuer = "https://localhost:5001",
-                    ValidAudience = "https://localhost:5001",
-                    IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes("superSecretKey@345"))
-                };
-            });
-
 
 builder.Services.AddAuthorization();
 
+builder.Services.AddScoped<IHtmlDataExtraction, HtmlDataExtraction>();
+
+
+builder.Services.AddSwaggerGen(options =>
+{
+    options.SwaggerDoc("v1", new OpenApiInfo { Title = "Dictionary Parser API", Version = "v1" });
+    options.AddSecurityDefinition("oauth2", new OpenApiSecurityScheme
+    {
+        In = ParameterLocation.Header,
+        Name = "Authorization",
+        Type = SecuritySchemeType.ApiKey
+    });
+    options.OperationFilter<SecurityRequirementsOperationFilter>();
+});
+
 var app = builder.Build();
 
-// Configure the HTTP request pipeline.
+app.UseCors("cors");
+
+app.UseAuthentication();
+
+app.UseAuthorization();
+//app.UseHttpsRedirection();
+
 
 app.UseSwagger(c =>
 {
@@ -92,14 +81,6 @@ app.UseSwaggerUI(c =>
     c.RoutePrefix = "dictionary-parser/swagger";
 });
 
-
 app.MapControllers();
-
-app.UseCors(MyAllowSpecificOrigins);
-
-app.UseRouting();
-//app.UseHttpsRedirection();
-app.UseAuthentication();
-app.UseAuthorization();
 
 app.Run();
