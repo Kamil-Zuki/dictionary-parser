@@ -9,7 +9,7 @@ namespace dictionary_parser.BLL.Services
     {
         private async Task<List<TermData>> FindTerm(string word, enumSpeechElement speechElement)
         {
-            List<TermData> termData = new List<TermData>();
+            List<TermData> termData = new();
             await Task.Run(() =>
             {
                 string campDictionaryPrefix = @"https://dictionary.cambridge.org/";
@@ -20,28 +20,17 @@ namespace dictionary_parser.BLL.Services
                 WordStructure baseWord = new();
 
                 HtmlWeb web = new HtmlWeb();
-                HtmlDocument? htmlDoc = new();
+                HtmlDocument? htmlDoc = new(); 
 
                 htmlDoc = web.Load(fullUrl);// Загрузка всей страницы Html
 
-                HtmlNodeCollection? wordBlocks;
-
-                switch (speechElement)
+                HtmlNodeCollection? wordBlocks = speechElement switch
                 {
-                    case enumSpeechElement.Word:
-                        wordBlocks = htmlDoc.DocumentNode.SelectNodes("//div[@class='pr entry-body__el']");//word
-                        break;
-                    case enumSpeechElement.PhrasalVerb:
-                        wordBlocks = htmlDoc.DocumentNode.SelectNodes("//div[@class='pv-block']");//phrasal verb
-                        break;
-                    case enumSpeechElement.Idiom:
-                        wordBlocks = htmlDoc.DocumentNode.SelectNodes("//div[@class='idiom-block']");//idiom
-                        break;
-                    default:
-                        wordBlocks = null;
-                        break;
-                }
-
+                    enumSpeechElement.Word => htmlDoc.DocumentNode.SelectNodes("//div[@class='pr entry-body__el']"),//word
+                    enumSpeechElement.PhrasalVerb => htmlDoc.DocumentNode.SelectNodes("//div[@class='pv-block']"),//phrasal verb
+                    enumSpeechElement.Idiom => htmlDoc.DocumentNode.SelectNodes("//div[@class='idiom-block']"),//idiom
+                    _ => null,
+                };
                 if (wordBlocks == null)
                     return null;
 
@@ -241,7 +230,6 @@ namespace dictionary_parser.BLL.Services
                                 useCase.Content = useCaseNode.InnerText
                                     .Split('(').Last()
                                     .Split(')').First();
-
                             }
 
                             HtmlNodeCollection? ddef_blocks = debHtmlDoc.DocumentNode.SelectNodes($"//div[@class='def-block ddef_block ']");
