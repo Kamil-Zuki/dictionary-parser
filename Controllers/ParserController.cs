@@ -1,12 +1,9 @@
 using dictionary_parser.BLL.Interfaces;
 using dictionary_parser.Models;
-using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
-using System.Net;
 
 namespace dictionary_parser.Controllers
 {
-    [Authorize]
     [ApiController]
     [Route("api/v1/cambridge-dictionary")]
     public class CambridgeDictionaryController : ControllerBase
